@@ -66,9 +66,9 @@ where it will store the 32bit representation of each character into the pointer
 of the current tape, similar to `memcpy` in C/C++
 Example:\
 `>>`\
-[0, 0, __0__, 0 , 0]\
+[0, 0, <__0__>, 0 , 0]\
 `"Hi!"`\
-[0, 0, __72__, 105 , 33]\
+[0, 0, <__72__>, 105 , 33]\
 
 #### The Stack Tape
 
