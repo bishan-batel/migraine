@@ -1,6 +1,6 @@
 # Migraine
 
-It's brainfuck but a bit more usable
+It's BrainF*ck (BF) but a bit more usable
 
 Now with hot new features like:
 
@@ -20,3 +20,24 @@ Now with hot new features like:
 	- [ ] Linux x86_64 Architecture
 	- [ ] Win x86_64 Architecture
 	- [ ] Mac x86_64 Architecture
+
+# Language Features
+Here is a comparison of 'Hello World' between BF and Migraine (without any comments):
+
+
+## Hello World in BF
+```brainfuck
+++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++.
+```
+
+## Hello World in Migraine
+
+```brainfuck
+@main {
+  ^11
+	"Hello World"
+	[.>]
+}
+```
+
+The first major difference between Migraine and Brainf*ck is 
