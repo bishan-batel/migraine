@@ -2,25 +2,37 @@
 pub struct FilePos {
     pub line: usize,
     pub column: usize,
-    pub idx: usize,
 }
 
-impl From<(usize, usize)> for FilePos {
-    fn from(src: (usize, usize)) -> Self {
-        Self {
-            line: src.0,
-            column: src.1,
-            idx: 0,
+impl FilePos {
+    pub fn new() -> Self {
+        Self { line: 1, column: 1 }
+    }
+
+    pub fn advance(&mut self, c: Option<char>) {
+        if let Some(c) = c {
+            if c == '\n' {
+                self.column = 1;
+                self.line += 1;
+            } else {
+                self.column += 1;
+            }
         }
     }
 }
 
 #[derive(Debug)]
 pub enum ParserError {
-    IllegalCharacter(FilePos),
+    // Preprocessor
     NoSubMacros(FilePos),
     NoMacroDef(FilePos),
+
+    // Lexer
+    IllegalCharacter(char, FilePos),
     LiteralNotEnded(FilePos),
     FunctionMustEndWithWhitespace(FilePos),
+    MacroNotDefined(FilePos),
+
+    #[allow(dead_code)]
     Generic,
 }

@@ -11,7 +11,6 @@ pub fn process(src: String) -> Result<Box<String>, ParserError> {
 #[derive(Debug)]
 struct Macro {
     name: String,
-    full_name: String,
     content: String,
 }
 
@@ -19,6 +18,7 @@ struct PreProccessor {
     src: String,
     out: Builder,
     idx: usize,
+    file_pos: FilePos,
     next: Option<char>,
     macros: Vec<Macro>,
     defining: Option<(String, usize)>,
@@ -26,19 +26,31 @@ struct PreProccessor {
 
 impl PreProccessor {
     fn new(src: String) -> Self {
+        let mut macros = Default::default();
+
+        Self::add_default_macros(&mut macros);
         Self {
             next: src.chars().nth(0),
             src,
+            file_pos: FilePos::new(),
             idx: 0,
             out: Default::default(),
             defining: None,
-            macros: Default::default(),
+            macros,
         }
+    }
+
+    fn add_default_macros(macros: &mut Vec<Macro>) {
+        macros.push(Macro {
+            name: "$FUNNY!".to_string(),
+            content: "420 69".to_string(),
+        });
     }
 
     fn advance(&mut self) {
         self.idx += 1;
         self.next = self.src.chars().nth(self.idx);
+        self.file_pos.advance(self.next);
     }
 
     /// Consumes self
@@ -64,12 +76,14 @@ impl PreProccessor {
     }
 
     fn macro_call_read(&mut self, idx: usize) -> Result<bool, ParserError> {
-        // checks if 
+        // checks if call matches any defined macros
         for r#macro in self.macros.iter() {
-            let full_name = r#macro.full_name.as_str();
-            if self.read_word(full_name, idx) {
+            let name = r#macro.name.as_str();
+            let name_len = name.len();
+
+            if self.read_word(name, idx) {
                 self.out.append(r#macro.content.clone());
-                self.skip(full_name.len());
+                self.skip(name_len);
                 return Ok(true);
             }
         }
@@ -81,7 +95,7 @@ impl PreProccessor {
         if self.read_word(MACRO_END_WORD, end_idx) {
             // if no macrodef was called then return err
             if self.defining.is_none() {
-                return Err(ParserError::NoMacroDef((end_idx, 0).into()));
+                return Err(ParserError::NoMacroDef(self.file_pos));
             }
 
             let (name, start_idx) = self.defining.clone().unwrap();
@@ -89,8 +103,7 @@ impl PreProccessor {
             self.defining = None;
 
             let r#macro = Macro {
-                full_name: "$".to_string() + name.as_str() + "!",
-                name,
+                name: "$".to_string() + name.as_str() + "!",
                 content: self.src.substring(start_idx, end_idx - 1).to_string(),
             };
 
@@ -112,7 +125,7 @@ impl PreProccessor {
     fn macro_def_read(&mut self, start_idx: usize) -> Result<bool, ParserError> {
         if self.read_word(MACRO_DEF_WORD, start_idx) {
             if self.defining.is_some() {
-                return Err(ParserError::NoSubMacros((start_idx, 0).into()));
+                return Err(ParserError::NoSubMacros(self.file_pos));
             }
 
             // Advances to skip macro keyword

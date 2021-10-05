@@ -1,6 +1,6 @@
 use string_builder::Builder;
 
-use super::err::ParserError;
+use super::err::{FilePos, ParserError};
 
 #[derive(Debug, Clone)]
 pub enum Token {
@@ -21,6 +21,7 @@ pub enum Op {
     Literal(String),
     PtrRight,
     PtrLeft,
+    BitNot,
 
     // Stack Operations
     PushNew(usize),
@@ -37,7 +38,11 @@ pub enum StackOp {
     Sub,
     Mul,
     Div,
-    Xor,
+
+    // Bitwise
+    BitAnd,
+    BitOr,
+    BitXor,
 }
 
 enum StackType {
@@ -49,6 +54,7 @@ enum StackType {
 pub struct Lexer {
     src: Box<String>,
     idx: usize,
+    file_pos: FilePos,
     next_char: Option<char>,
     tokens: Box<Vec<Token>>,
 }
@@ -57,6 +63,7 @@ impl Lexer {
     pub fn new(src: Box<String>) -> Self {
         Self {
             idx: 0,
+            file_pos: FilePos::new(),
             next_char: src.chars().nth(0),
             src,
             tokens: Default::default(),
@@ -66,11 +73,19 @@ impl Lexer {
     pub fn advance(&mut self) {
         self.idx += 1;
         self.next_char = self.src.chars().nth(self.idx);
+        self.file_pos.advance(self.next_char);
     }
 
     pub fn regress(&mut self) {
         self.idx -= 1;
         self.next_char = self.src.chars().nth(self.idx);
+
+        // recalculates filepos
+        self.file_pos = FilePos::new();
+
+        for i in 0..(self.idx) {
+            self.file_pos.advance(self.src.chars().nth(i));
+        }
     }
 
     /// Consumes self
@@ -82,6 +97,7 @@ impl Lexer {
                 continue;
             }
             match curr {
+                '$' => return Err(ParserError::MacroNotDefined(self.file_pos)),
                 // non ops
                 '@' => self.function_call()?,
                 '{' => {
@@ -105,10 +121,10 @@ impl Lexer {
                                 }
                                 self.advance();
                             }
-                            continue
-                        } 
+                            continue;
+                        }
                     }
-                    return Err(ParserError::IllegalCharacter((self.idx, 0).into()));
+                    return Err(ParserError::IllegalCharacter(curr, self.file_pos));
                 }
 
                 // Unary Char Operations
@@ -118,6 +134,7 @@ impl Lexer {
                 '<' => self.op(Op::PtrLeft),
                 '+' => self.op(Op::Inc),
                 '-' => self.op(Op::Dec),
+                '~' => self.op(Op::BitNot),
 
                 // String Literal
                 '"' => self.str_literal()?,
@@ -128,7 +145,7 @@ impl Lexer {
                 '^' => self.stack_op(StackType::Push),
 
                 // invalid characters
-                _ => return Err(ParserError::IllegalCharacter((self.idx, 0).into())),
+                _ => return Err(ParserError::IllegalCharacter(curr, self.file_pos)),
             }
         }
         Ok(self.tokens)
@@ -138,7 +155,6 @@ impl Lexer {
     fn stack_op(&mut self, stack: StackType) {
         self.advance();
         let stack_op = if let Some(curr) = self.next_char {
-
             // special case for push for push new ( ^10)
             if match stack {
                 StackType::Push => true,
@@ -175,6 +191,11 @@ impl Lexer {
                 '/' => StackOp::Div,
                 '=' => StackOp::Set,
 
+                // Bitwise
+                '&' => StackOp::BitAnd,
+                '|' => StackOp::BitOr,
+                '^' => StackOp::BitXor,
+
                 // go back if next char isn't part of a dualchar op
                 _ => {
                     self.regress();
@@ -209,7 +230,7 @@ impl Lexer {
             builder.append(curr);
             self.advance();
         }
-        Err(ParserError::FunctionMustEndWithWhitespace((0, 0).into()))
+        Err(ParserError::FunctionMustEndWithWhitespace(self.file_pos))
     }
 
     fn str_literal(&mut self) -> Result<(), ParserError> {
@@ -229,7 +250,7 @@ impl Lexer {
                     self.advance();
                 } else {
                     // returns error if reaches end of file after escape char
-                    return Err(ParserError::LiteralNotEnded((0, 0).into()));
+                    return Err(ParserError::LiteralNotEnded(self.file_pos));
                 }
                 continue;
             }
@@ -246,7 +267,7 @@ impl Lexer {
             builder.append(curr);
             self.advance();
         }
-        Err(ParserError::LiteralNotEnded((0, 0).into()))
+        Err(ParserError::LiteralNotEnded(self.file_pos))
     }
 
     pub fn op(&mut self, op: Op) {

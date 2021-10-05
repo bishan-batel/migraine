@@ -98,7 +98,7 @@ An example of how you can manipulate the stack / stack pointer:
 
 __Keep Note:__ Each individual tape contains a store for its own pointer, so if you
 are on a tape selected on cell 34, and move to the next tape selected on it's
-cell 3, and then go back to the first tape; the tape would still be selected on 
+cell 3, and then go back to the first tape; the tape would still be selected on
 cell 34
 
 As well as just creating tapes to isolate memory, you can also perform operations
