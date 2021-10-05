@@ -33,11 +33,11 @@ Here is a comparison of 'Hello World' between BF and Migraine (without any comme
 
 ### Hello World in Migraine
 
-```migraine
+```brainfuck
 @main {
-  ^11
-  "Hello World"
-  [.>]
+	^11
+	"Hello World"
+	[.>]
 }
 ```
 
@@ -46,29 +46,6 @@ Here is a comparison of 'Hello World' between BF and Migraine (without any comme
 The first major difference between Migraine and Brainf\*ck is functions
 which are defined as `@<name> { <code> }`, the terminology is 'functions' but
 it may be more helpful to think about them as subroutines such as in assembly
-
-```migraine
-@printHelloWorld {
-  ^3
-  "Hi\0"
-  [.>]&
-}
-
-@main {
-  @printHelloWorld
-}
-```
-
-#### Literals
-
-By writing text such as `"Hello World"` in migraine, it treats it as a literal operator
-where it will store the 32bit representation of each character into the pointer
-of the current tape, similar to `memcpy` in C/C++
-Example:\
-`>>`\
-[0, 0, __0__, 0 , 0]\
-`"Hi!"`\
-[0, 0, __72__, 105 , 33]\
 
 #### The Stack Tape
 
@@ -80,13 +57,5 @@ them and perform operations between 2
 tapes at a time.
 
 An example of how you can manipulate the stack:
-```migraine 
-@main {
-  ^20 // Creates a new tape in stack of 20 cells 
-  "Hello World" // store 'Hello World' into new tape
-  _ // Move to select the stack below (default root stack of size 0)
-  ^ // Move to select the stack above (the one we created)
-  & // Move to select the stack below and delete the stack we were previously on
-  ^ // Move to stack above, but because we deleted the stack we would get an err
-}
-```
+__rofl bob__
+__&__
