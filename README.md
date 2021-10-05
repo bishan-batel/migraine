@@ -1,6 +1,7 @@
 # Migraine
 
-It's BrainF\*ck (BF) but a bit more usable
+It's the [BrainF\*ck (BF)](https://en.wikipedia.org/wiki/Brainfuck) programming
+language, but a bit more usable
 
 Now with hot new features like:
 
@@ -95,7 +96,7 @@ An example of how you can manipulate the stack / stack pointer:
 }
 ```
 
-Keep Note: Each individual tape contains a store for its own pointer, so if you
+__Keep Note:__ Each individual tape contains a store for its own pointer, so if you
 are on a tape selected on cell 34, and move to the next tape selected on it's
 cell 3, and then go back to the first tape; the tape would still be selected on 
 cell 34
