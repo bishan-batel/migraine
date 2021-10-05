@@ -12,11 +12,11 @@ Now with hot new features like:
 
 - [x] Preprocessor (for macros)
 	- [x] Macros
-	- [] Include statements
+	- [ ] Include statements
 - [x] Lexer / Tokenizer
-- [] Parser / Parsetree generation
-- [] Intepreter
-- [] Compiler
-	- [] Linux x86_64 Architecture
-	- [] Win x86_64 Architecture
-	- [] Mac x86_64 Architecture
+- [ ] Parser / Parsetree generation
+- [ ] Intepreter
+- [ ] Compiler
+	- [ ] Linux x86_64 Architecture
+	- [ ] Win x86_64 Architecture
+	- [ ] Mac x86_64 Architecture
