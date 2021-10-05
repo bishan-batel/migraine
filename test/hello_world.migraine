@@ -1,0 +1,7 @@
+@main {
+	^13
+	"Hello World!"
+	[.>]&
+}
+
+// vim:ft=migraine 
