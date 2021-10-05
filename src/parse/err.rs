@@ -1,3 +1,5 @@
+use super::lexer::Token;
+
 #[derive(Debug, Copy, Clone)]
 pub struct FilePos {
     pub line: usize,
@@ -33,6 +35,12 @@ pub enum ParserError {
     FunctionMustEndWithWhitespace(FilePos),
     MacroNotDefined(FilePos),
 
+    // Parser
+    UnexpectedToken(Token, FilePos),
+    FunctionCallMustBeInFunction(String, FilePos),
+    NoNestedFunctionDefines(FilePos),
+    LoopNotEnded(FilePos),
+    DuplicateFunctionNames(FilePos),
     #[allow(dead_code)]
     Generic,
 }

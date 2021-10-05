@@ -1,7 +1,13 @@
-$macrodef OP & $macroend
-
 @main {
-	$FUNNY!
+	++
+	@print_rofl
+}
+
+@print_rofl {
+	^100
+	"Rofl Bob"
+	[.>]
+	&
 }
 
 // vim:ft=migraine

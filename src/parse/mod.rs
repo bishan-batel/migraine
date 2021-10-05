@@ -1,17 +1,22 @@
 pub mod err;
 pub mod lexer;
-mod preproc;
+pub mod parser;
+pub mod preproc;
 use err::*;
+use parser::Func;
 
-use self::lexer::Lexer;
+use self::{lexer::Lexer, parser::Parser};
 
 const TEST_PGM: &str = include_str!("../../test/test.migraine");
 
-pub fn parse() -> Result<(), ParserError> {
+pub fn parse() -> Result<Vec<Func>, ParserError> {
     let processed = preproc::process(TEST_PGM.to_string())?;
+    println!("Preprocess Done");
 
-    println!("Tokenizing...");
     let tokens = Lexer::new(processed).tokenize()?;
-    println!("{:?}", tokens);
-    Ok(())
+    println!("Tokenization done");
+
+    let functions = Parser::new(tokens).create_functions()?;
+    println!("Parsing done");
+    Ok(functions)
 }

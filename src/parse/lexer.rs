@@ -56,7 +56,7 @@ pub struct Lexer {
     idx: usize,
     file_pos: FilePos,
     next_char: Option<char>,
-    tokens: Box<Vec<Token>>,
+    tokens: Vec<(Token, FilePos)>,
 }
 
 impl Lexer {
@@ -89,7 +89,7 @@ impl Lexer {
     }
 
     /// Consumes self
-    pub fn tokenize(mut self) -> Result<Box<Vec<Token>>, ParserError> {
+    pub fn tokenize(mut self) -> Result<Vec<(Token, FilePos)>, ParserError> {
         while let Some(curr) = self.next_char {
             // Skip whitespace
             if curr.is_whitespace() {
@@ -101,11 +101,19 @@ impl Lexer {
                 // non ops
                 '@' => self.function_call()?,
                 '{' => {
-                    self.tokens.push(Token::FunctionDefine);
+                    self.tokens.push((Token::FunctionDefine, self.file_pos));
                     self.advance();
                 }
                 '}' => {
-                    self.tokens.push(Token::FunctionEnd);
+                    self.tokens.push((Token::FunctionEnd, self.file_pos));
+                    self.advance();
+                }
+                '[' => {
+                    self.tokens.push((Token::LoopStart, self.file_pos));
+                    self.advance();
+                }
+                ']' => {
+                    self.tokens.push((Token::LoopEnd, self.file_pos));
                     self.advance();
                 }
 
@@ -176,7 +184,8 @@ impl Lexer {
                     }
                     // turns read number into u32
                     let size: usize = builder.string().unwrap().parse().unwrap();
-                    self.tokens.push(Token::Op(Op::PushNew(size)));
+                    self.tokens
+                        .push((Token::Op(Op::PushNew(size)), self.file_pos));
                     return;
                 }
             }
@@ -212,7 +221,7 @@ impl Lexer {
             StackType::HardPop => Op::HardPopOp(stack_op),
             StackType::Push => Op::PushOp(stack_op),
         });
-        self.tokens.push(next_tok);
+        self.tokens.push((next_tok, self.file_pos));
     }
 
     // Used to read function calls as well as function defines (eg. @main, @main {})
@@ -224,7 +233,8 @@ impl Lexer {
             if curr.is_whitespace() {
                 let func_name = builder.string().unwrap();
                 self.advance();
-                self.tokens.push(Token::FunctionCall(func_name));
+                self.tokens
+                    .push((Token::FunctionCall(func_name), self.file_pos));
                 return Ok(());
             }
             builder.append(curr);
@@ -271,7 +281,7 @@ impl Lexer {
     }
 
     pub fn op(&mut self, op: Op) {
-        self.tokens.push(Token::Op(op));
+        self.tokens.push((Token::Op(op), self.file_pos));
         self.advance();
     }
 }
