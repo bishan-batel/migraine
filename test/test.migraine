@@ -1,13 +1,30 @@
+$macrodef MAX_CELLS 100 $macroend
+
 @main {
-	++
-	@print_rofl
+	^$MAX_CELLS!
+	"E".
+	^3
+	.
+	&.
 }
 
-@print_rofl {
-	^100
-	"Rofl Bob"
+@print_Fizz {
+	^5 
+	"Fizz\0"
 	[.>]
 	&
 }
 
+@print_Buzz {
+	^5 
+	"Buzz\0"
+	[.>]
+	&
+}
+
+@print_NewLine {
+	^1
+	"\n".
+	&
+}
 // vim:ft=migraine

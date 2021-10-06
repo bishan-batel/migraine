@@ -9,16 +9,16 @@ struct UnparsedFunc {
     content: Vec<(Token, FilePos)>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Func {
-    name: String,
-    node: OpNode,
+    pub name: String,
+    pub node: OpNode,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum OpNode {
     Loop(Vec<OpNode>),
-    Group(Vec<OpNode>),
+    Root(Vec<OpNode>),
     Operation(Op),
     FuncCall(String),
 }
@@ -38,7 +38,7 @@ impl Parser {
         for unparsed in self.get_unparsed_functions()? {
             funcs.push(Func {
                 name: unparsed.name,
-                node: OpNode::Group(Self::create_parse_tree(
+                node: OpNode::Root(Self::create_parse_tree(
                     &mut unparsed.content.iter(),
                     false,
                     FilePos::new(),

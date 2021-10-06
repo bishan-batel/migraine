@@ -7,10 +7,8 @@ use parser::Func;
 
 use self::{lexer::Lexer, parser::Parser};
 
-const TEST_PGM: &str = include_str!("../../test/test.migraine");
-
-pub fn parse() -> Result<Vec<Func>, ParserError> {
-    let processed = preproc::process(TEST_PGM.to_string())?;
+pub fn parse(content: String) -> Result<Vec<Func>, ParserError> {
+    let processed = preproc::process(content)?;
     println!("Preprocess Done");
 
     let tokens = Lexer::new(processed).tokenize()?;
