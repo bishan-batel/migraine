@@ -45,8 +45,7 @@ Here is a comparison of 'Hello World' between BF and Migraine (without any comme
 #### Functions
 
 The first major difference between Migraine and Brainf\*ck is functions
-which are defined as `@<name> { <code> }`, the terminology is 'functions' but
-it may be more helpful to think about them as subroutines such as in assembly
+which are defined as `@<name> { <code> }`
 
 ```migraine
 @printHelloWorld {
