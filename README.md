@@ -15,8 +15,8 @@ Now with hot new features like:
   - [x] Macros
   - [ ] Include statements
 - [x] Lexer / Tokenizer
-- [ ] Parser / Parsetree generation
-- [ ] Intepreter
+- [x] Parser / Parsetree generation
+- [x] Intepreter
 - [ ] Compiler
   - [ ] Linux x86_64 Architecture
   - [ ] Win x86_64 Architecture
